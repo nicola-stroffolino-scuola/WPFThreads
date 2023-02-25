@@ -1,5 +1,5 @@
 # WpfThreads
-### Introduzione al Problema
+## Introduzione al Problema
 
 Se noi volessimo stampare un numero che continua ad incrementarsi e volessimo vedere il numero che si incrementa dovremmo inserire un **delay**.
 Esiste la possibilità di "addormentare" il sistema per un tot di millisecondi.
@@ -13,7 +13,7 @@ Ma questa istruzione **blocca completamente** tutto il sistema che gestisce l'in
 Per questo motivo dovremmo lanciardse e un **thread separato** su cui spostare su di esso il pezzo di codice che vogliamo eseguire.
 
 ---
-### Il Multi-Threading
+## Il Multi-Threading
 
 ```cs
 private void Button_Click(object sender, RoutedEventArgs e){
@@ -31,7 +31,7 @@ private void incrementa(){
 }
 ```
 
-##### I Primi Problemi
+### I Primi Problemi
 Il thread chiamante non riesce ad accedere a questo oggetto perché quell'oggetto è proprietà del thread principale.
 Per consentire a diverse parti del codice di interagire in modo sicuro con il thread principale utilizziamo il ***Dispatcher***.
 
@@ -50,7 +50,7 @@ private void incrementa(){
 La funzione principale del dispatcher è quella di garantire che tutte le operazioni dell'interfaccia utente (UI) vengano eseguite nel thread dell'interfaccia utente. 
 Ciò significa che se una operazione richiede di accedere all'interfaccia utente, come ad esempio l'aggiornamento di un controllo o la modifica di un valore, il dispatcher garantisce che tale operazione venga eseguita in modo sicuro nel thread corretto.
 
-##### Concorrenza tra i Processi
+### Concorrenza tra i Processi
 Tuttavia ci imbattiamo in un altro problema: se il thread non ha ancora terminato la sua esecuzione e ne avviamo altri questi gireranno tutti in parallelo facendo confusione l'uno con l'altro.
 Una soluzione plausibile potrebbe essere la **terminazione forzata** di un processo ogni volta che ne viene avviato uno nuovo tramite l'istruzione:
 
@@ -72,7 +72,7 @@ lock(_locker){ ... }
 int _counter = 0;
 ```
 
-##### Mettere Insieme i Pezzi
+### Mettere Insieme i Pezzi
 Infine la nostra funzione di ***Incrementa*** prenderebbe una forma del genere:
 
 ```cs
