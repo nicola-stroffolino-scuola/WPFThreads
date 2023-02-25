@@ -12,7 +12,6 @@ Ma questa istruzione **blocca completamente** tutto il sistema che gestisce l'in
 
 Per questo motivo dovremmo lanciardse e un **thread separato** su cui spostare su di esso il pezzo di codice che vogliamo eseguire.
 
----
 ## Il Multi-Threading
 
 ```cs
