@@ -1,5 +1,4 @@
 # WpfThreads
----
 ### Introduzione al Problema
 
 Se noi volessimo stampare un numero che continua ad incrementarsi e volessimo vedere il numero che si incrementa dovremmo inserire un **delay**.
