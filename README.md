@@ -89,5 +89,3 @@ private void incrementa1(){
 	}
 }
 ```
-
----
