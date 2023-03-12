@@ -51,6 +51,7 @@ namespace nicola.stroffolino._4i.wpfThreads
 
                 Dispatcher.Invoke(() => {
                     lblCounter1.Text = _counter.ToString();
+                    pbrBar1.Value = _counter;
                 });
 
                 Thread.Sleep(1);

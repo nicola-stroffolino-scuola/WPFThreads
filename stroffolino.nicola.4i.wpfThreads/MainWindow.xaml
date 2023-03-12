@@ -8,23 +8,28 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Grid.ColumnSpan="2">
-            <Button Width="100" Click="Button_Click"></Button>
-            <Button Width="100"></Button>
-        </StackPanel>
+        <Button Grid.Row="0" Grid.ColumnSpan="3" Width="300" Height="75" Click="Button_Click" FontSize="36">Start</Button>
 
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
-            <TextBlock x:Name="lblCounter1" FontSize="50"></TextBlock>
-            <TextBlock x:Name="lblCounter2" FontSize="50"></TextBlock>
-            <TextBlock x:Name="lblCounter3" FontSize="50"></TextBlock>
-        </StackPanel>
+        <TextBlock Grid.Row="1" Grid.Column="0" x:Name="lblCounter1" FontSize="50">0</TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="lblCounter2" FontSize="50">0</TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="2" x:Name="lblCounter3" FontSize="50">0</TextBlock>
+
+        <ProgressBar Grid.Row="2" Grid.Column="0" x:Name="pbrBar1" Minimum="0" Maximum="5000"></ProgressBar>
+        <ProgressBar Grid.Row="2" Grid.Column="1" x:Name="pbrBar2" Minimum="0" Maximum="5000"></ProgressBar>
+        <ProgressBar Grid.Row="2" Grid.Column="2" x:Name="pbrBar3" Minimum="0" Maximum="5000"></ProgressBar>
+
+        <TextBlock Grid.Row="3" Grid.ColumnSpan="3" x:Name="lblCounterTot" FontSize="50">0</TextBlock>
     </Grid>
 </Window>
