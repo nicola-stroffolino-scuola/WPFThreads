@@ -20,16 +20,27 @@
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="0" Grid.ColumnSpan="3" Width="300" Height="75" Click="Button_Click" FontSize="36">Start</Button>
+        <Button x:Name="StartBtn" Grid.ColumnSpan="3" 
+                Width="300" Height="75" FontSize="36" 
+                Click="Start">Start</Button>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" x:Name="lblCounter1" FontSize="50">0</TextBlock>
-        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="lblCounter2" FontSize="50">0</TextBlock>
-        <TextBlock Grid.Row="1" Grid.Column="2" x:Name="lblCounter3" FontSize="50">0</TextBlock>
+        <TextBlock x:Name="lblCounter1" Grid.Row="1" Grid.Column="0" 
+                   FontSize="50" TextAlignment="Center" VerticalAlignment="Center">0</TextBlock>
+        <TextBlock x:Name="lblCounter2" Grid.Row="1" Grid.Column="1" 
+                   FontSize="50" TextAlignment="Center" VerticalAlignment="Center">0</TextBlock>
+        <TextBlock x:Name="lblCounter3" Grid.Row="1" Grid.Column="2" 
+                   FontSize="50" TextAlignment="Center" VerticalAlignment="Center">0</TextBlock>
 
-        <ProgressBar Grid.Row="2" Grid.Column="0" x:Name="pbrBar1" Minimum="0" Maximum="5000"></ProgressBar>
-        <ProgressBar Grid.Row="2" Grid.Column="1" x:Name="pbrBar2" Minimum="0" Maximum="5000"></ProgressBar>
-        <ProgressBar Grid.Row="2" Grid.Column="2" x:Name="pbrBar3" Minimum="0" Maximum="5000"></ProgressBar>
+        <ProgressBar x:Name="pbrBar1" Grid.Row="2" Grid.Column="0" 
+                     Minimum="0"  Maximum="5000"/>
+        <ProgressBar x:Name="pbrBar2" Grid.Row="2" Grid.Column="1" 
+                     Minimum="0"  Maximum="500"/>
+        <ProgressBar x:Name="pbrBar3" Grid.Row="2" Grid.Column="2" 
+                     Minimum="0"  Maximum="50"/>
 
-        <TextBlock Grid.Row="3" Grid.ColumnSpan="3" x:Name="lblCounterTot" FontSize="50">0</TextBlock>
+        <TextBlock x:Name="lblCounterTot" Grid.Row="3" Grid.ColumnSpan="3" 
+                   FontSize="50" TextAlignment="Center" VerticalAlignment="Center">0</TextBlock>
+        <ProgressBar x:Name="pbrBarTot" Grid.Row="4" Grid.ColumnSpan="3" 
+                     Minimum="0" Maximum="5000"></ProgressBar>
     </Grid>
 </Window>
