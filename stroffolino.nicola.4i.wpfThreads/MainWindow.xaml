@@ -41,6 +41,6 @@
         <TextBlock x:Name="lblCounterTot" Grid.Row="3" Grid.ColumnSpan="3" 
                    FontSize="50" TextAlignment="Center" VerticalAlignment="Center">0</TextBlock>
         <ProgressBar x:Name="pbrBarTot" Grid.Row="4" Grid.ColumnSpan="3" 
-                     Minimum="0" Maximum="5000"></ProgressBar>
+                     Minimum="0" Maximum="5550"></ProgressBar>
     </Grid>
 </Window>

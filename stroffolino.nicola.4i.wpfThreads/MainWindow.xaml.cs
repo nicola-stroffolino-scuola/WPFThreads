@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,71 +17,69 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace nicola.stroffolino._4i.wpfThreads
-{
+namespace nicola.stroffolino._4i.wpfThreads {
+    // Source https://stackoverflow.com/a/67060100/17043535 Per l'MMWrapper
+    // Source https://gist.github.com/mjs3339/b98bbf4075be0176ac521c9875652dfe Per il timeKillEvent
+    public class WinMMWrapper {
+        [DllImport("WinMM.dll", SetLastError = true)]
+        public static extern uint timeSetEvent(int msDelay, int msResolution,
+            TimerEventHandler handler, ref int userCtx, int eventType);
+        [DllImport("WinMM.dll", SetLastError = true)]
+        public static extern void timeKillEvent(UInt32 timerEventId);
+
+        public delegate void TimerEventHandler(uint id, uint msg, ref int userCtx,
+            int rsv1, int rsv2);
+
+        public enum TimerEventType {
+            OneTime = 0,
+            Repeating = 1
+        }
+
+        private readonly Action _elapsedAction;
+        private readonly int _elapsedMs;
+        private readonly int _resolutionMs;
+        private readonly TimerEventType _timerEventType;
+        private readonly TimerEventHandler _timerEventHandler;
+
+        public WinMMWrapper(int elapsedMs, int resolutionMs, TimerEventType timerEventType, Action elapsedAction) {
+            _elapsedMs = elapsedMs;
+            _resolutionMs = resolutionMs;
+            _timerEventType = timerEventType;
+            _elapsedAction = elapsedAction;
+            _timerEventHandler = TickHandler;
+        }
+
+        public uint StartElapsedTimer() {
+            var myData = 1; //dummy data
+            return timeSetEvent(_elapsedMs, _resolutionMs / 10, _timerEventHandler, ref myData, (int)_timerEventType);
+        }
+
+        private void TickHandler(uint id, uint msg, ref int userctx, int rsv1, int rsv2) {
+            _elapsedAction();
+        }
+    }
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
-    {
+    public partial class MainWindow : Window {
         //const int GIRI = 1000;
         //int _counter = 0;
-        //static readonly object _locker = new object();
-        CountdownEvent semaforo { get; set; }
-
-        public MainWindow()
-        {
+        static readonly object Locker = new object();
+        public int TotalCount { get; set; }
+        CountdownEvent? Semaforo { get; set; }
+        WinMMWrapper[] Timers { get; set; } // Dichiarati come attributi per evitare che il
+                                            // Garbage Collector elimini le instanze di timer
+                                            // al di fuori del suo scope
+        public MainWindow() {
             InitializeComponent();
+            TotalCount = 0;
+            Timers = new WinMMWrapper[4];
         }
-
-        /*private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Thread thread1 = new Thread(incrementa1);
-            thread1.Start();
-
-            Thread thread2 = new Thread(incrementa2);
-            thread2.Start();
-        }
-
-        // Processo lento che dobbiamo lanciare...
-        private void incrementa1()
-        {
-            for (int x = 0; x < GIRI; x++)
-            {
-                lock (_locker)
-                {
-                    _counter++;
-                }
-
-                Dispatcher.Invoke(() => {
-                    lblCounter1.Text = _counter.ToString();
-                    pbrBar1.Value = _counter;
-                });
-
-                Thread.Sleep(1);
-            }
-        }
-
-        private void incrementa2()
-        {
-            for (int x = 0; x < GIRI; x++)
-            {
-                lock (_locker)
-                {
-                    _counter++;
-                }
-
-                Dispatcher.Invoke(() => {
-                    lblCounter2.Text = _counter.ToString();
-                });
-
-                Thread.Sleep(1);
-            }
-        }*/
 
         private void Start(object sender, RoutedEventArgs e) {
             StartBtn.IsEnabled = false;
-            semaforo = new CountdownEvent(3);
+            Semaforo = new CountdownEvent(3);
 
             var thread1 = new Thread(Incrementa1);
             thread1.Start();
@@ -90,49 +91,128 @@ namespace nicola.stroffolino._4i.wpfThreads
             thread3.Start();
 
             var threadWait = new Thread(() => {
-                semaforo.Wait();
+                Semaforo.Wait();
                 Dispatcher.Invoke(() => {
                     StartBtn.IsEnabled = true;
                 });
             });
             threadWait.Start();
+
+            /*var threadTot = new Thread(IncrementaTot);
+            threadTot.Start();*/
         }
 
         private void Incrementa1() {
-            for (int i = 0; i <= 5000; i++) {
-                //if (i % 2 != 0) continue; // Approssimare 
+            int i = 0;
+            uint id = 0;
+            Timers[0] = new WinMMWrapper(1, 0, WinMMWrapper.TimerEventType.Repeating, () => {
+                lock (Locker) { TotalCount++; }
+                i++;
                 Dispatcher.Invoke(() => {
                     lblCounter1.Text = i.ToString();
                     pbrBar1.Value = i;
                 });
-                Thread.Sleep(1);
-            }
-
-            semaforo.Signal();
+                if (i == 5000) {
+                    WinMMWrapper.timeKillEvent(id);
+                    Semaforo!.Signal();
+                }
+            });
+            id = Timers[0].StartElapsedTimer();
         }
 
-        private void Incrementa2() { 
-            for (int i = 0; i <= 500; i++) {
+        private void Incrementa2() {
+            int i = 0;
+            uint id = 0;
+            Timers[1] = new WinMMWrapper(10, 0, WinMMWrapper.TimerEventType.Repeating, () => {
+                lock (Locker) { TotalCount++; }
+                i++;
                 Dispatcher.Invoke(() => {
                     lblCounter2.Text = i.ToString();
                     pbrBar2.Value = i;
                 });
-                Thread.Sleep(10);
-            }
-
-            semaforo.Signal();
+                if (i == 500) {
+                    WinMMWrapper.timeKillEvent(id);
+                    Semaforo!.Signal();
+                }
+            });
+            id = Timers[1].StartElapsedTimer();
         }
 
         private void Incrementa3() {
-            for (int i = 0; i <= 50; i++) {
+            int i = 0;
+            uint id = 0;
+            Timers[2] = new WinMMWrapper(100, 0, WinMMWrapper.TimerEventType.Repeating, () => {
+                lock (Locker) { TotalCount++; }
+                i++;
                 Dispatcher.Invoke(() => {
                     lblCounter3.Text = i.ToString();
                     pbrBar3.Value = i;
                 });
+                if (i == 50) {
+                    WinMMWrapper.timeKillEvent(id);
+                    Semaforo!.Signal();
+                }
+            });
+            id = Timers[2].StartElapsedTimer();
+        }
+
+        /*private void IncrementaTot() {
+            uint id = 0;
+            Timers[3] = new WinMMWrapper(1, 0, WinMMWrapper.TimerEventType.Repeating, () => {
+                Dispatcher.Invoke(() => {
+                    lblCounterTot.Text = TotalCount.ToString();
+                    pbrBarTot.Value = TotalCount;
+                });
+                if (TotalCount == 5550) WinMMWrapper.timeKillEvent(id);
+            });
+            id = Timers[3].StartElapsedTimer();
+        }*/
+
+        /*private void Incrementa1() {
+            for (int x = 0; x <= 5000; x++) {
+                lock (Locker) {
+                   TotalCount++;
+                }
+
+                Dispatcher.Invoke(() => {
+                    lblCounter1.Text = x.ToString();
+                    pbrBar1.Value = x;
+                });
+
+                Thread.Sleep(1);
+            }
+            Semaforo!.Signal();
+        }
+
+        private void Incrementa2() {
+            for (int x = 0; x <= 500; x++) {
+                lock (Locker) {
+                    TotalCount++;
+                }
+
+                Dispatcher.Invoke(() => {
+                    lblCounter2.Text = x.ToString();
+                    pbrBar2.Value = x;
+                });
+
+                Thread.Sleep(10);
+            }
+            Semaforo!.Signal();
+        }
+        private void Incrementa3() {
+            for (int x = 0; x <= 50; x++) {
+                lock (Locker) {
+                    TotalCount++;
+                }
+
+                Dispatcher.Invoke(() => {
+                    lblCounter3.Text = x.ToString();
+                    pbrBar3.Value = x;
+                });
+
                 Thread.Sleep(100);
             }
-
-            semaforo.Signal();
-        }
+            Semaforo!.Signal();
+        }*/
     }
 }
