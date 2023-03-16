@@ -79,7 +79,7 @@ namespace nicola.stroffolino._4i.wpfThreads {
 
         private void Start(object sender, RoutedEventArgs e) {
             StartBtn.IsEnabled = false;
-            Semaforo = new CountdownEvent(3);
+            Semaforo = new CountdownEvent(4);
 
             var thread1 = new Thread(Incrementa1);
             thread1.Start();
@@ -90,6 +90,9 @@ namespace nicola.stroffolino._4i.wpfThreads {
             var thread3 = new Thread(Incrementa3);
             thread3.Start();
 
+            var threadTot = new Thread(IncrementaTot);
+            threadTot.Start();
+            
             var threadWait = new Thread(() => {
                 Semaforo.Wait();
                 Dispatcher.Invoke(() => {
@@ -97,9 +100,6 @@ namespace nicola.stroffolino._4i.wpfThreads {
                 });
             });
             threadWait.Start();
-
-            /*var threadTot = new Thread(IncrementaTot);
-            threadTot.Start();*/
         }
 
         private void Incrementa1() {
@@ -156,63 +156,22 @@ namespace nicola.stroffolino._4i.wpfThreads {
             id = Timers[2].StartElapsedTimer();
         }
 
-        /*private void IncrementaTot() {
+        private void IncrementaTot() {
             uint id = 0;
+            Dispatcher.Invoke(() => {
+                pbrBarTot.Maximum += 5550;
+            });
             Timers[3] = new WinMMWrapper(1, 0, WinMMWrapper.TimerEventType.Repeating, () => {
                 Dispatcher.Invoke(() => {
                     lblCounterTot.Text = TotalCount.ToString();
                     pbrBarTot.Value = TotalCount;
                 });
-                if (TotalCount == 5550) WinMMWrapper.timeKillEvent(id);
+                if (TotalCount % 5550 == 0) {
+                    WinMMWrapper.timeKillEvent(id);
+                    Semaforo!.Signal();
+                }
             });
             id = Timers[3].StartElapsedTimer();
-        }*/
-
-        /*private void Incrementa1() {
-            for (int x = 0; x <= 5000; x++) {
-                lock (Locker) {
-                   TotalCount++;
-                }
-
-                Dispatcher.Invoke(() => {
-                    lblCounter1.Text = x.ToString();
-                    pbrBar1.Value = x;
-                });
-
-                Thread.Sleep(1);
-            }
-            Semaforo!.Signal();
         }
-
-        private void Incrementa2() {
-            for (int x = 0; x <= 500; x++) {
-                lock (Locker) {
-                    TotalCount++;
-                }
-
-                Dispatcher.Invoke(() => {
-                    lblCounter2.Text = x.ToString();
-                    pbrBar2.Value = x;
-                });
-
-                Thread.Sleep(10);
-            }
-            Semaforo!.Signal();
-        }
-        private void Incrementa3() {
-            for (int x = 0; x <= 50; x++) {
-                lock (Locker) {
-                    TotalCount++;
-                }
-
-                Dispatcher.Invoke(() => {
-                    lblCounter3.Text = x.ToString();
-                    pbrBar3.Value = x;
-                });
-
-                Thread.Sleep(100);
-            }
-            Semaforo!.Signal();
-        }*/
     }
 }
