@@ -269,7 +269,7 @@ Il che risulta vero fino ad un certo punto, dove durante l'esecuzione notiamo ch
 ![milliseconds](./img/milliseconds.png)
 
 Questo è dovuto ad un problema delle API di Windows che non riescono a mettere in pausa il Thread per 1ms preciso nel contatore da 5000 non rispetta, bensì riesce solamente a rappresentare un approssimazione di attorno i 15ms.
-Questa imprecisione è spiegata in questo articolo su Code Project : https://www.codeproject.com/Articles/17474/Timer-surprises-and-how-to-avoid-them
+Questa imprecisione è spiegata in questa risposta di un utente su Stack Overflow : https://stackoverflow.com/a/6254753
 
 ### Risoluzione
 
