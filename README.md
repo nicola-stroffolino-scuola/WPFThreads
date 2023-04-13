@@ -27,7 +27,7 @@ Thread.Sleep(1000); // 1 secondo
 
 Ma questa istruzione **blocca completamente** tutto il sistema che gestisce l'interfaccia grafica, per questo generalmente non è buona pratica creare degli `EventHandler` che durano per molto tempo.
 
-Per questo motivo dovremmo lanciare e un **thread separato** su cui spostare su di esso il pezzo di codice che vogliamo eseguire e di conseguenza la funzione di **sleep** addormenterà solamente il thread esterno.
+Per questo motivo dovremmo lanciare un **thread separato** su cui spostare il pezzo di codice lento e di conseguenza la funzione di **sleep** addormenterà solamente il thread esterno.
 
 ## Il Multithreading
 
@@ -50,7 +50,7 @@ private void Start(object sender, RoutedEventArgs e) {
 }
 ```
 
-In questa funzione `Start()`, associata ad un `Button`, vengono inizializzati 4 `Thread` :
+In questo metodo `Start()`, associata ad un `Button`, vengono inizializzati 4 `Thread` :
 - **thread1** $\rightarrow$ Si occupa di eseguire la funzione `Incrementa1` che aggiornerà il primo contatore.
 - **thread2** $\rightarrow$ Si occupa di eseguire la funzione `Incrementa2` che aggiornerà il secondo contatore.
 - **thread3** $\rightarrow$ Si occupa di eseguire la funzione `Incrementa3` che aggiornerà il terzo contatore.
